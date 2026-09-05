@@ -112,7 +112,7 @@ The workflow automates multiple steps of the process, reducing repetitive manual
 
 
 # Certification
-**N8N Academy — [Certificate Name] · 2026** - [View Certificate](https://badges.n8n.io/549663f4-67d8-44ca-9f13-7dd92e4cf346#acc.eqTrBc5o)
+**N8N Academy · 2026** - [View Certificate](https://badges.n8n.io/549663f4-67d8-44ca-9f13-7dd92e4cf346#acc.eqTrBc5o)
 
 ---
 
