@@ -1,0 +1,1196 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "is:unread -label:n8n-processed"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        80
+      ],
+      "id": "0cf8fbf2-c9eb-42a5-ba0f-9b51e8836e55",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=the subject : {{ $json.Subject }}\nthe body : {{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "social",
+              "description": "Notifications from social networks and community platforms — new followers, likes, comments, mentions, friend requests, or activity digests (LinkedIn, Instagram, Facebook, X, Reddit, Discord). Not a message from a real person you know — an automated platform notification."
+            },
+            {
+              "category": "Promotions",
+              "description": "Marketing emails from brands/services you already have a relationship with — newsletters, product announcements, \"new arrivals,\" general marketing content. No urgency, no discount code."
+            },
+            {
+              "category": "Action required",
+              "description": "Emails where you must personally do something with a deadline or consequence — sign a document, confirm an appointment, respond to a request, verify an account, pay an overdue bill, approve something. Test: is there a specific action only you can take, and does ignoring it cost you something?"
+            },
+            {
+              "category": "personal",
+              "description": "A direct email written by an actual individual to you specifically — friends, family, colleagues, or 1:1 correspondence. Not automated, not bulk-sent. Test: could this only have been written by someone who knows you?"
+            },
+            {
+              "category": "receipts",
+              "description": "Confirmation of a completed transaction — order confirmations, payment receipts, invoices, subscription renewal charges, delivery confirmations. Test: money has already been spent/charged; this is a record, not a request."
+            },
+            {
+              "category": "uncategorized",
+              "description": "Anything that doesn't clearly fit the above — automated system emails with no action needed, unclear senders, or content that doesn't match any pattern above with confidence."
+            },
+            {
+              "category": "offers",
+              "description": "Marketing emails specifically containing a discount, coupon, deal, or limited-time incentive (\"20% off,\" \"flash sale,\" \"ends tonight\"). Test: is there a specific dollar/percent discount or promo code? If yes → offers. If it's just general brand content → Promotions."
+            },
+            {
+              "category": "recruitment",
+              "description": "Emails related to a hiring process — from either side (candidate or recruiter/company) — covering job applications, interview scheduling, offers, rejections, or recruiter outreach. Test: Is the email about a specific person being considered for, or pursuing, a specific job (application, interview, offer, rejection, or sourcing outreach)?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "ae3a2f9f-720a-4f1e-b18e-9d25269fb639",
+      "name": "Text Classifier",
+      "retryOnFail": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        352
+      ],
+      "id": "4f68047a-5cfd-4dc4-a10c-822f43ef33f3",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "CATEGORY_SOCIAL",
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        -112
+      ],
+      "id": "65bd32cd-40c4-4805-89d7-bb777ba3a686",
+      "name": "socials",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "CATEGORY_PROMOTIONS",
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        80
+      ],
+      "id": "2f93cfbe-28de-44b7-bb21-e5b6e62ade7e",
+      "name": "Promotions",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.message_id }}",
+        "labelIds": [
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        336
+      ],
+      "id": "225aaeed-3ec3-4d71-ae59-a04e157786d5",
+      "name": "Action Required",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.message_id }}",
+        "labelIds": [
+          "CATEGORY_PERSONAL",
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        528
+      ],
+      "id": "fb69bf3e-bacd-40d8-84bb-c33525d34f7a",
+      "name": "Personal",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json[\"message id\"] }}",
+        "labelIds": [
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        720
+      ],
+      "id": "82ae52f4-2b55-4fde-82f7-e49bc4b9d944",
+      "name": "receipts",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "alwaysOutputData": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34a1d051-fbbc-46f2-b3eb-a3b7fbad66a9",
+              "name": "=description",
+              "value": "={{$json.Subject}}",
+              "type": "string"
+            },
+            {
+              "id": "7201d444-1628-4049-84cf-889d243c74dd",
+              "name": "vendor",
+              "value": "={{ $json.From.split('<')[1].replace('>', '') }}",
+              "type": "string"
+            },
+            {
+              "id": "f4b81d3c-7d51-41f2-843d-b65d4b09f6d0",
+              "name": "amount",
+              "value": "={{ Number($json.snippet.match(/[0-9]+(?:[.,][0-9]+)?/)?.[0]) }}",
+              "type": "string"
+            },
+            {
+              "id": "884d83cd-f8b0-478a-b83b-e07d1f0edb7d",
+              "name": "date",
+              "value": "={{ new Date(Number($json.internalDate)).toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "4ed1ce58-b74a-4412-8c5d-4d6705be7f54",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        720
+      ],
+      "id": "39d9b375-1865-4d4d-af36-cc97287544f7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('Edit Fields').item.json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        720
+      ],
+      "id": "7b3b9fd5-baf6-4163-9de5-1a3d8d87b697",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "My purchases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "description": "={{ $json.description }}",
+            "vendor": "={{ $json.vendor }}",
+            "amount": "={{ $json.amount }}",
+            "date": "={{ $json.date }}",
+            "message id": "={{ $json[\"message_id\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "vendor",
+              "displayName": "vendor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message id",
+              "displayName": "message id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        720
+      ],
+      "id": "43322707-d868-4bbe-a072-ee18613641e2",
+      "name": "Append row in sheet",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        -112
+      ],
+      "id": "f43ffda2-6769-45dd-a621-f3f90ebf6e82",
+      "name": "Mark a message as read",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.socialEmails) staticData.socialEmails = [];\n\nstaticData.socialEmails.push({\n  from: $json.From,\n  subject: $json.Subject,\n  snippet: $json.snippet || $json.Text,\n  date: new Date().toISOString()\n});\n\nreturn [{ json: { queued: true, count: staticData.socialEmails.length } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -112
+      ],
+      "id": "b9723ce5-278f-4703-a846-87a810c3961f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        80
+      ],
+      "id": "29a3ebfb-2041-4198-b42d-5d734fc7ae76",
+      "name": "Mark a message as read1",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an email action-extraction assistant.\n\nThe email has already been classified as \"Action Required\".\nYour job is NOT to classify the email again.\n\nYour job is to analyze the email and extract exactly what the user needs to do.\n\nReturn ONLY valid JSON. Do not use markdown, code blocks, explanations, or additional text.\n\nThe JSON must follow this exact structure:\n\n{\n  \"action_required\": true,\n  \"task_title\": \"\",\n  \"description\": \"\",\n  \"due_date\": null,\n  \"priority\": \"medium\"\n}\n\nRules:\n\n1. action_required\n- Always set this to true because this workflow only receives emails already classified as Action Required.\n\n2. task_title\n- Write a short, clear task describing what the user needs to do.\n- Start with an action verb when possible.\n- Examples:\n  - \"Send CV to recruiter\"\n  - \"Reply to internship email\"\n  - \"Submit project report\"\n  - \"Confirm interview availability\"\n\n3. description\n- Briefly explain what needs to be done.\n- Include useful context from the email.\n- Do not copy the entire email.\n\n4. due_date\n- Extract the deadline if the email contains one.\n- Return the date in ISO 8601 format: YYYY-MM-DD.\n- If there is a specific time, use: YYYY-MM-DDTHH:MM:SS.\n- If there is no deadline, return null.\n- Never invent a deadline.\n- Interpret relative dates such as \"tomorrow\", \"next Friday\", or \"by the end of the week\" using the current date provided to you.\n\n5. priority\nChoose exactly one:\n- \"high\": urgent, time-sensitive, or important action; deadline is very soon or consequences are significant.\n- \"medium\": action is required but not immediately urgent.\n- \"low\": action is required but has little urgency.\n\n6. If multiple actions exist:\n- Combine them into one main task if they are part of the same request.\n- Put the important details in the description.\n\n7. Ignore:\n- Email signatures\n- Marketing content\n- Unnecessary greetings\n- Information that does not require an action\n\nExample:\n\nEmail:\n\"Hi Mehdi,\nPlease send us your CV and your latest transcript before August 2nd.\nBest regards.\"\n\nOutput:\n\n{\n  \"action_required\": true,\n  \"task_title\": \"Send CV and transcript\",\n  \"description\": \"Send your CV and latest transcript as requested.\",\n  \"due_date\": \"2026-08-02\",\n  \"priority\": \"high\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1120,
+        336
+      ],
+      "id": "526f485a-0e7c-4d89-a707-0e45e48307d0",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        416
+      ],
+      "id": "9511478f-7bb0-40de-b96d-b9b3f1562c2c",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "task": "REPLACE_WITH_YOUR_TASK_LIST_ID",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleTasks",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        336
+      ],
+      "id": "eb514884-2a23-4188-baf9-48535120d53c",
+      "name": "Create a task",
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Google Tasks account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('Edit Fields3').item.json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        336
+      ],
+      "id": "0575e1cf-4e56-4aca-b01c-ac29adc2aad0",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.message_id }}",
+        "labelIds": [
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        1136
+      ],
+      "id": "b0562c36-da2e-4a05-a178-f7e24083875c",
+      "name": "recruitment",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('Edit Fields2').item.json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        1136
+      ],
+      "id": "6b988397-8ba1-478e-aaf6-ba9e87ba517e",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a672ccf-49c7-44ba-992d-d9894ecece08",
+              "name": "description",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "405ae8fc-9a88-45c8-b30c-421e51f65714",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f86356dd-61d8-4e45-9fb3-ba334201b838",
+              "name": "message ",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        1136
+      ],
+      "id": "e22f4f03-718a-43a1-b10f-5d1c0b78a469",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a672ccf-49c7-44ba-992d-d9894ecece08",
+              "name": "description",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "405ae8fc-9a88-45c8-b30c-421e51f65714",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f86356dd-61d8-4e45-9fb3-ba334201b838",
+              "name": "message ",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        336
+      ],
+      "id": "e3d5bc34-a352-41ca-9a1b-0c23a80f6e58",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a672ccf-49c7-44ba-992d-d9894ecece08",
+              "name": "description",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "405ae8fc-9a88-45c8-b30c-421e51f65714",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f86356dd-61d8-4e45-9fb3-ba334201b838",
+              "name": "message ",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        912
+      ],
+      "id": "66b0ec3e-61a5-49a8-b831-bbfd820bdcb0",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.message_id }}",
+        "labelIds": [
+          "REPLACE_WITH_YOUR_LABEL_ID"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        912
+      ],
+      "id": "dae08fae-a674-4fd0-a7bb-d151cd98950d",
+      "name": "Add label to message",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        912
+      ],
+      "id": "eed208e0-8332-4dba-859f-da66724a7d05",
+      "name": "Mark a message as read2",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a672ccf-49c7-44ba-992d-d9894ecece08",
+              "name": "description",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "405ae8fc-9a88-45c8-b30c-421e51f65714",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f86356dd-61d8-4e45-9fb3-ba334201b838",
+              "name": "message ",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        528
+      ],
+      "id": "321dec8e-5927-4a09-b623-34db62f1a6d5",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "inputText": "=the subject : {{ $json.description }}\nthe body : {{ $json['message '] }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Accepted",
+              "description": "Emails that confirm a positive outcome — an interview invitation, a job offer, an assessment/test request, or explicit advancement to the next stage of the hiring process. Test: Does the email invite the candidate to a next step (interview, offer, assessment) or explicitly state they've advanced? If yes → Accepted."
+            },
+            {
+              "category": "Refused",
+              "description": "Emails that inform the candidate their application will not be moving forward, has been rejected, or the position has been filled by someone else. Test: Does the email contain a clear negative decision — \"unfortunately,\" \"will not be moving forward,\" \"pursuing other candidates,\" \"position has been filled\"? If yes → Refused."
+            },
+            {
+              "category": "Received",
+              "description": "Emails that only acknowledge the application was submitted/received, with no decision yet — a neutral holding message. Test: Does the email simply confirm receipt (\"thank you for applying,\" \"we have received your application,\" \"we will review and get back to you\") with no decision or next step mentioned? If yes → Received."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        1136
+      ],
+      "id": "e40991c2-b93a-4758-8f27-765e295434af",
+      "name": "Text Classifier1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        1360
+      ],
+      "id": "1493634d-0ac2-44ce-932b-a218bf0af54a",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('Edit Fields2').item.json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        1200
+      ],
+      "id": "91b5b4ed-be93-473d-a130-f9c78091ff82",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('Edit Fields2').item.json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        1408
+      ],
+      "id": "2e133a77-3429-4701-8785-90adec6d8b74",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{$json.message_id}}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        1200
+      ],
+      "id": "8a6d197e-df3d-432a-9df6-f77fbf055b15",
+      "name": "Mark a message as read3",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{$json.message_id}}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        1408
+      ],
+      "id": "15fc32ae-e695-4564-830e-6c54aafa3f90",
+      "name": "Mark a message as read4",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Gmail account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "socials",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Promotions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "socials": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promotions": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Action Required": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "receipts": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "receipts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark a message as read": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Create a task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recruitment": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "recruitment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Action Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REPLACE_WITH_YOUR_INSTANCE_ID"
+  }
+}
