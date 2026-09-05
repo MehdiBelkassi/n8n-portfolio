@@ -28,7 +28,7 @@ Throughout, the workflow uses Gmail's label system to prevent re-processing the 
 
 - n8n
 - Gmail API (trigger, labeling, read status)
-- Groq (LLM inference — `gpt-oss-20b`)
+- Groq (LLM inference  `gpt-oss-20b`)
 - LangChain Text Classifier & AI Agent nodes
 - Google Sheets API
 - Google Tasks API
