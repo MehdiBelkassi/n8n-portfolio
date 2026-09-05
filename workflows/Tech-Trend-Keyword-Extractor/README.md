@@ -1,151 +1,37 @@
-# Amazon Bestsellers → Pinterest Affiliate Automation
+# Tech Trend Keyword Extractor
 
-An end-to-end automation workflow built with **n8n** that discovers Amazon Best Seller products, generates Pinterest-optimized content using a local AI model, and automatically publishes affiliate pins to Pinterest.
+An end-to-end automation built with **n8n** that scrapes trending topics and content signals from seven different sources developer communities, search engines, and top-ranking web pages and stores the cleaned, deduplicated results in Google Sheets for trend research.
 
-The workflow is fully automated, from product discovery to content generation and publishing, while avoiding duplicate products.
-
----
-
-## Features
-
-- Automatically discovers Amazon Best Seller products
-- Generates product category URLs using a local AI model (Ollama)
-- Scrapes product information from Amazon
-- Stores products inside Google Sheets
-- Removes duplicate products automatically
-- Generates Pinterest SEO titles and descriptions using AI
-- Resizes product images for Pinterest
-- Publishes pins automatically through a custom posting API
-- Runs on a configurable schedule without manual intervention
+The workflow combines **Hacker News**, **Reddit**, **GitHub**, **Google/Bing/YouTube Autocomplete**, and **SERP scraping (Zenserp)** to build a multi-source dataset of what's trending in tech, with a focus on the AI / vibe-coding tools space.
 
 ---
 
-# Workflow Overview
+## How It Works
 
-The automation is divided into three main stages.
+The automation runs on manual trigger and fans out into **7 parallel branches**, each following the same pattern: **fetch → parse → append to sheet → wait → dedupe → clear sheet → rewrite clean data**.
 
-## 1. Product Discovery
+- **Hacker News** Fetches the current top story IDs from HN's Firebase API, retrieves each story's title, score, comment count, and URL.
+- **Reddit** Pulls the top 100 posts of the week from r/programming and extracts title, score, comments, and URL.
+- **GitHub** Searches for repositories with 500+ stars pushed recently, sorted by stars, extracting name, description, star count, language, and URL.
+- **Google Autocomplete** Queries Google's suggestion API against a fixed list of ~25 seed keywords (e.g. "vibe coding," "ai app builder," "cursor ai," "lovable ai") to surface related search demand.
+- **Bing Autocomplete** Same seed keywords against Bing's suggestion endpoint.
+- **YouTube Autocomplete** Same seed keywords against YouTube's suggestion endpoint to catch video-specific search trends.
+- **Top Ranked Websites** Uses Zenserp to pull organic Google search results for the seed keywords, filters out low-signal domains (Reddit, Forbes, LinkedIn, Medium, Twitter, YouTube), fetches the remaining pages, and strips the HTML down to plain text content for analysis.
 
-The workflow starts on a schedule.
-
-The AI generates multiple Amazon Best Seller category URLs related to home decor products such as:
-
-- Floor Lamps
-- Furniture
-- Rugs
-- Lighting
-- Candles
-- Home Accessories
-
-Each generated URL is visited automatically.
-
-For every category, the workflow extracts:
-
-- Product Rank
-- ASIN
-- Product Title
-- Price
-- Image URL
-- Amazon Product Link
-
-The extracted products are then stored inside Google Sheets.
+Each branch re-reads its own sheet after appending, removes duplicate entries (by title or content), and rewrites a clean version back so re-running the workflow never accumulates duplicate rows.
 
 ---
 
-## 2. Data Cleaning
-
-Once all products are collected:
-
-- Every row is loaded from Google Sheets.
-- Duplicate products are detected using the ASIN.
-- Only unique products are kept.
-- The sheet is refreshed with the cleaned dataset.
-
-This ensures products are never processed twice.
-
----
-
-## 3. Pinterest Content Generation
-
-For every product:
-
-A local LLM (running through Ollama) generates:
-
-- Pinterest title
-- SEO-friendly description
-- Relevant keyword tags
-
-The prompts are optimized for high click-through rates by focusing on:
-
-- Curiosity
-- Benefits
-- Home decor inspiration
-- SEO keywords
-
----
-
-## 4. Image Preparation
-
-Before publishing:
-
-- The original Amazon product image is resized to Pinterest dimensions.
-- Images are converted into a Pinterest-friendly format.
-
----
-
-## 5. Pinterest Publishing
-
-Finally, the workflow sends the generated content to a custom posting service.
-
-Each published pin contains:
-
-- Optimized Pinterest title
-- SEO description
-- Product image
-- Amazon affiliate link
-- Pinterest board
-
-Everything is published automatically without manual intervention.
-
----
-
-# Technologies Used
+## Technologies Used
 
 - n8n
-- Ollama
-- Llama 3.1
-- Google Sheets
-- Amazon Best Sellers
-- JavaScript
-- HTTP Requests
-- HTML Extraction
-- Pinterest API (custom posting service)
+- Hacker News API
+- Reddit API
+- GitHub REST API
+- Google / Bing / YouTube Autocomplete endpoints
+- Zenserp (SERP API)
+- Google Sheets API
+- JavaScript (Code nodes)
+- HTML-to-text extraction
 
 ---
-
-# AI Usage
-
-This project uses a **local Large Language Model** through Ollama to:
-
-- Generate Amazon category URLs
-- Write Pinterest titles
-- Create SEO descriptions
-- Generate keyword tags
-
-No cloud AI service is required.
-
----
-
-# Project Structure
-
-The workflow includes:
-
-- Scheduled triggers
-- AI Agents
-- HTTP Requests
-- HTML Extraction
-- JavaScript processing
-- Google Sheets integration
-- Duplicate removal
-- Image preprocessing
-- Pinterest publishing
